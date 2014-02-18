@@ -58,6 +58,7 @@
             <exclude>config/dspace.cfg</exclude>
             <exclude>config/log4j.properties</exclude>
             <exclude>config/modules/**</exclude>
+            <exclude>config/tomcat/**</exclude>
          </excludes>
       </fileSet>
       <!-- Copy over all module configs & filter them -->
@@ -67,6 +68,15 @@
             <include>config/modules/**</include>
          </includes>
          <filtered>true</filtered>
+      </fileSet>
+
+      <!-- Copy the tomcat configs and filter them -->
+      <fileSet>
+        <outputDirectory>.</outputDirectory>
+        <includes>
+          <include>config/tomcat/**</include>
+        </includes>
+        <filtered>true</filtered>
       </fileSet>
    </fileSets>
 

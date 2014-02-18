@@ -1,0 +1,3 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Context displayName="${dspace.name} OAI" docBase="${dspace.install.dir}/webapps/oai" path="/${dspace.baseApp}-OAI" workDir="work/Catalina/localhost/${dspace.baseApp}-OAI">
+</Context>

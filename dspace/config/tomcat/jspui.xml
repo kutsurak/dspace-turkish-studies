@@ -1,0 +1,3 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Context displayName="${dspace.name}" docBase="${dspace.install.dir}/webapps/jspui" path="/${dspace.baseApp}" workDir="work/Catalina/localhost/${dspace.baseApp}">
+</Context>

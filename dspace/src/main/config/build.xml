@@ -82,6 +82,24 @@ Common usage:
                 <regexp pattern="^\s*dspace\.dir\s+" />
             </linecontainsregexp>
         </filterchain>
+
+        <filterchain>
+          <linecontainsregexp>
+            <regexp pattern="\s*dspace\.tomcat\.dir\s+"/>
+          </linecontainsregexp>
+        </filterchain>
+
+        <filterchain>
+          <linecontainsregexp>
+            <regexp pattern="\s*dspace\.tomcat\.conf\.dir\s+"/>
+          </linecontainsregexp>
+        </filterchain>
+
+        <filterchain>
+          <linecontainsregexp>
+            <regexp pattern="\s*dspace\.webapp\s+"/>
+          </linecontainsregexp>
+        </filterchain>
     </loadproperties>
 
     <!-- Load the configuration -->
@@ -671,9 +689,35 @@ Common usage:
         </copy>
 
         <antcall target="build_webapps_wars"/>
+        <antcall target="copy_webapp_confs"/>
 
     </target>
 
+
+    <!-- ============================================================= -->
+    <!-- Copy Web Applications conf files to tomcat directory -->
+    <!-- ============================================================= -->
+
+    <target name="copy_webapp_confs" description="Copy the webapp descriptors to the tomcat directory">
+
+      <mkdir dir="config/tomcat/tmp"/>
+      <copy todir="config/tomcat/tmp" includeEmptyDirs="false">
+        <fileset dir="config/tomcat">
+          <exclude name="*jspui*"/>
+        </fileset>
+        <mapper type="glob" from="*" to="${dspace.webapp}-*"/>
+      </copy>
+
+      <copy file="config/tomcat/jspui.xml" tofile="config/tomcat/tmp/${dspace.webapp}.xml"/>
+
+      <copy todir="${dspace.tomcat.conf.dir}" preservelastmodified="false" failonerror="no">
+        <fileset dir="config/tomcat/tmp">
+          <include name="**/*.xml"/>
+        </fileset>
+      </copy>
+
+      <delete dir="config/tomcat/tmp"/>
+    </target>
 
     <!-- ============================================================= -->
     <!-- Compress Web Applications                                     -->
