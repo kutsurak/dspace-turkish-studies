@@ -82,6 +82,24 @@ Common usage:
                 <regexp pattern="^\s*dspace\.dir\s+" />
             </linecontainsregexp>
         </filterchain>
+
+        <filterchain>
+          <linecontainsregexp>
+            <regexp pattern="\s*dspace\.tomcat\.dir\s+"/>
+          </linecontainsregexp>
+        </filterchain>
+
+        <filterchain>
+          <linecontainsregexp>
+            <regexp pattern="\s*dspace\.tomcat\.conf\.dir\s+"/>
+          </linecontainsregexp>
+        </filterchain>
+
+        <filterchain>
+          <linecontainsregexp>
+            <regexp pattern="\s*dspace\.webapp\s+"/>
+          </linecontainsregexp>
+        </filterchain>
     </loadproperties>
 
     <!-- Load the configuration -->
@@ -671,9 +689,35 @@ Common usage:
         </copy>
 
         <antcall target="build_webapps_wars"/>
+        <antcall target="copy_webapp_confs"/>
 
     </target>
 
+
+    <!-- ============================================================= -->
+    <!-- Copy Web Applications conf files to tomcat directory -->
+    <!-- ============================================================= -->
+
+    <target name="copy_webapp_confs" description="Copy the webapp descriptors to the tomcat directory">
+
+      <mkdir dir="config/tomcat/tmp"/>
+      <copy todir="config/tomcat/tmp" includeEmptyDirs="false">
+        <fileset dir="config/tomcat">
+          <exclude name="*jspui*"/>
+        </fileset>
+        <mapper type="glob" from="*" to="${dspace.webapp}-*"/>
+      </copy>
+
+      <copy file="config/tomcat/jspui.xml" tofile="config/tomcat/tmp/${dspace.webapp}.xml"/>
+
+      <copy todir="${dspace.tomcat.conf.dir}" preservelastmodified="false" failonerror="no">
+        <fileset dir="config/tomcat/tmp">
+          <include name="**/*.xml"/>
+        </fileset>
+      </copy>
+
+      <delete dir="config/tomcat/tmp"/>
+    </target>
 
     <!-- ============================================================= -->
     <!-- Compress Web Applications                                     -->
@@ -997,6 +1041,54 @@ Common usage:
 ====================================================================
         </echo>
 
+    </target>
+
+
+    <!-- ============================================================= -->
+    <!-- Do a fresh system install without touching the DB             -->
+    <!-- ============================================================= -->
+
+    <target name="fresh_install_no_db"
+            depends="init_installation,init_configs,test_database,install_code"
+            description="Do a fresh install of the system, overwriting
+                         any data, without touching the db">
+
+      <delete failonerror="no">
+        <fileset dir="${dspace.dir}/webapps" includes="**/*" />
+      </delete>
+
+      <antcall target="copy_webapps" />
+
+      <java classname="org.dspace.search.DSIndexer" classpathref="class.path" fork="yes" failonerror="yes">
+        <sysproperty key="log4j.configuration" value="file:config/log4j-console.properties" />
+        <sysproperty key="dspace.log.init.disable" value="true" />
+        <sysproperty key="dspace.configuration" value="${config}" />
+      </java>
+
+      <echo>
+        ====================================================================
+        The DSpace code has been installed.
+
+        To complete installation, you should do the following:
+
+        * Setup your Web servlet container (e.g. Tomcat) to look for your
+        DSpace web applications in: ${dspace.dir}/webapps/
+
+        OR, copy any web applications from ${dspace.dir}/webapps/ to
+        the appropriate place for your servlet container.
+        (e.g. '$CATALINA_HOME/webapps' for Tomcat)
+
+        * Make an initial administrator account (an e-person) in DSpace:
+
+        ${dspace.dir}/bin/dspace create-administrator
+
+        * Start up your servlet container (Tomcat etc.)
+
+        You should then be able to access your DSpace's 'home page':
+        ${dspace.url}
+
+        ====================================================================
+      </echo>
     </target>
 
 	<!-- installes GeoCity resolution database -->

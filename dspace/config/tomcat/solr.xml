@@ -1,0 +1,3 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Context displayName="${dspace.name}" docBase="${dspace.install.dir}/webapps/solr" path="/${dspace.baseApp}-solr" workDir="work/Catalina/localhost/${dspace.baseApp}">
+</Context>
